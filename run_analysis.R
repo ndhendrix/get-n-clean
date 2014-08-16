@@ -19,9 +19,6 @@ run_analysis <- function(){
   test <- cbind(test.subs, test.y, test.x)
   train <- cbind(train.subs, train.y, train.x)
   
-  test$data.source <- rep("test", nrow(test))
-  train$data.source <- rep("train", nrow(train))
-  
   raw.data <- rbind(test, train)
   
   raw.data$activity <- sapply(raw.data$activity, function(x){
@@ -51,10 +48,9 @@ run_analysis <- function(){
   }
   
   clean.data <- raw.data[, -passed.grep]
-  write.csv(clean.data, "clean_data.csv", row.names=FALSE)
 
   library(plyr)
 
   tidy.data <- ddply(clean.data, .(subject, activity), numcolwise(mean))
-  write.csv(tidy.data, "tidy_data.csv", row.names=FALSE)
+  write.table(tidy.data, "tidy_data.txt", row.names=FALSE)
 }
