@@ -1,4 +1,5 @@
 run_analysis <- function(){
+  #Reading in the separate files and giving them appropriate column names
   features <- read.table("features.txt")
   
   test.x <- read.table("./test/X_test.txt")
@@ -16,11 +17,12 @@ run_analysis <- function(){
   names(test.y) <- "activity"
   names(train.y) <- "activity"
   
+  #Combining the data into a large data set with all columns
   test <- cbind(test.subs, test.y, test.x)
   train <- cbind(train.subs, train.y, train.x)
-  
   raw.data <- rbind(test, train)
   
+  #Relabeling activities with human-readable labels
   raw.data$activity <- sapply(raw.data$activity, function(x){
     if(x==1){
       x <- "WALKING"
@@ -39,6 +41,7 @@ run_analysis <- function(){
   
   passed.grep <- integer()
   
+  #Determining which columns are not means or stds
   i <- 3
   while(i < ncol(raw.data)){
     if(!grepl("mean|std", names(raw.data)[i])){
@@ -47,10 +50,12 @@ run_analysis <- function(){
     i <- i + 1
   }
   
-  clean.data <- raw.data[, -passed.grep]
+  #Removing columns from dataset that are not means or stds
+  raw.data <- raw.data[, -passed.grep]
 
+  #Creating summary chart that averages each column by activity and subject,
+  #then writing that to a new table (see Codebook.md)
   library(plyr)
-
-  tidy.data <- ddply(clean.data, .(subject, activity), numcolwise(mean))
+  tidy.data <- ddply(raw.data, .(subject, activity), numcolwise(mean))
   write.table(tidy.data, "tidy_data.txt", row.names=FALSE)
 }
